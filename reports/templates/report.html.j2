@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Warden Scan Report</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --text: #e7ecf3;
+      --muted: #9aa7b8;
+      --critical: #e85d5d;
+      --high: #e6a23c;
+      --medium: #3db8c9;
+      --low: #6bbf8a;
+      --border: #2a3545;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      background: radial-gradient(ellipse at top, #1a2740 0%, var(--bg) 55%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    h1 { margin: 0 0 0.25rem; font-size: 1.75rem; letter-spacing: 0.02em; }
+    .meta { color: var(--muted); margin-bottom: 1.5rem; }
+    .counts {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+    .count {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 0.85rem 1.1rem;
+      min-width: 8rem;
+    }
+    .count .n { font-size: 1.6rem; font-weight: 700; }
+    .count.CRITICAL .n { color: var(--critical); }
+    .count.HIGH .n { color: var(--high); }
+    .count.MEDIUM .n { color: var(--medium); }
+    .count.LOW .n { color: var(--low); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      border: 1px solid var(--border);
+    }
+    th, td {
+      text-align: left;
+      padding: 0.75rem 0.9rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    th {
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    tr:last-child td { border-bottom: none; }
+    .sev {
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+    .sev.CRITICAL { color: var(--critical); }
+    .sev.HIGH { color: var(--high); }
+    .sev.MEDIUM { color: var(--medium); }
+    .sev.LOW { color: var(--low); }
+    .resource { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.85rem; }
+    .empty { color: var(--muted); padding: 1rem 0; }
+  </style>
+</head>
+<body>
+  <h1>Warden</h1>
+  <p class="meta">Cloud Security Posture Report · {{ generated_at }} · {{ finding_count }} finding(s)</p>
+
+  <div class="counts">
+    {% for sev, n in summary.items() %}
+    <div class="count {{ sev }}">
+      <div class="n">{{ n }}</div>
+      <div>{{ sev }}</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if findings %}
+  <table>
+    <thead>
+      <tr>
+        <th>Severity</th>
+        <th>Module</th>
+        <th>ID</th>
+        <th>Resource</th>
+        <th>Title</th>
+        <th>Remediation</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for f in findings %}
+      <tr>
+        <td><span class="sev {{ f.severity }}">{{ f.severity }}</span></td>
+        <td>{{ f.module }}</td>
+        <td>{{ f.id }}</td>
+        <td class="resource">{{ f.resource }}</td>
+        <td>
+          <strong>{{ f.title }}</strong>
+          <div class="meta">{{ f.description }}</div>
+        </td>
+        <td>{{ f.remediation }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">No findings.</p>
+  {% endif %}
+</body>
+</html>
