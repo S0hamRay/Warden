@@ -14,6 +14,9 @@ htmlcov/
 .DS_Store
 reports/report.json
 reports/report.html
+reports/attack_paths.json
+reports/attack_graph.dot
+reports/attack_graph.png
 sandbox/terraform/.terraform/
 sandbox/terraform/*.tfstate
 sandbox/terraform/*.tfstate.*

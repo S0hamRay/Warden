@@ -21,7 +21,16 @@ python -m scanner.core --source-path ./path/to/app --output reports/
 ./scripts/run_scan.sh
 ```
 
-Reports land in `reports/report.json` and `reports/report.html`.
+Reports land in `reports/report.json`, `reports/report.html`, `reports/attack_paths.json`, and `reports/attack_graph.dot` (PNG if Graphviz `dot` is installed).
+
+## Attack-path analysis
+
+After scanners emit findings, the `scanner/attack_graph` engine correlates them into multi-step paths (e.g. Internet → public EC2 → SSRF → IMDSv1 → instance role → PassRole escalation → S3).
+
+- Rules are declarative classes in `scanner/attack_graph/rules.py` — add new chains without editing the engine
+- Search methods: `--attack-path-method bfs|dfs|dijkstra`
+- Disable with `--no-attack-graph`
+- Install Graphviz to render `attack_graph.png`: `brew install graphviz`
 
 ## Modules
 

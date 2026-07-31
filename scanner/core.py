@@ -7,6 +7,7 @@ import logging
 import sys
 from typing import Sequence
 
+from scanner.attack_graph import AttackGraphEngine
 from scanner.aws_client import AwsClient
 from scanner.findings import Finding, has_critical
 from scanner.modules import MODULE_REGISTRY
@@ -37,7 +38,18 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--output",
         default="reports",
-        help="Directory for report.json / report.html",
+        help="Directory for report.json / report.html / attack_paths.json",
+    )
+    parser.add_argument(
+        "--attack-path-method",
+        choices=["bfs", "dfs", "dijkstra"],
+        default="bfs",
+        help="Graph search algorithm for attack paths (default: bfs)",
+    )
+    parser.add_argument(
+        "--no-attack-graph",
+        action="store_true",
+        help="Skip attack-path correlation and Graphviz export",
     )
     parser.add_argument(
         "--fail-on-critical",
@@ -101,7 +113,27 @@ def main(argv: Sequence[str] | None = None) -> int:
     modules = select_modules(args.modules)
     aws = AwsClient(region=args.region, profile=args.profile)
     findings = run_scan(modules, aws, source_path=args.source_path)
-    generate_reports(findings, output_dir=args.output)
+
+    if args.no_attack_graph:
+        generate_reports(
+            findings,
+            output_dir=args.output,
+            attack_paths=[],
+            run_attack_graph=False,
+        )
+    else:
+        engine = AttackGraphEngine()
+        graph, attack_paths = engine.analyze(
+            findings, method=args.attack_path_method
+        )
+        logger.info("Correlated %d attack path(s)", len(attack_paths))
+        generate_reports(
+            findings,
+            output_dir=args.output,
+            attack_paths=attack_paths,
+            graph=graph,
+            run_attack_graph=False,
+        )
 
     if args.fail_on_critical and has_critical(findings):
         logger.error("CRITICAL findings detected — failing scan")

@@ -26,6 +26,7 @@
       padding: 2rem;
     }
     h1 { margin: 0 0 0.25rem; font-size: 1.75rem; letter-spacing: 0.02em; }
+    h2 { margin: 2.5rem 0 0.75rem; font-size: 1.25rem; }
     .meta { color: var(--muted); margin-bottom: 1.5rem; }
     .counts {
       display: flex;
@@ -73,11 +74,25 @@
     .sev.LOW { color: var(--low); }
     .resource { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.85rem; }
     .empty { color: var(--muted); padding: 1rem 0; }
+    .path-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 1.25rem 1.4rem;
+      margin-bottom: 1rem;
+    }
+    .chain {
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      line-height: 1.45;
+      margin: 0.75rem 0;
+    }
+    .chain .arrow { color: var(--muted); margin: 0.15rem 0; }
+    .recs { margin: 0.5rem 0 0; padding-left: 1.1rem; color: var(--muted); }
+    .score { font-weight: 700; }
   </style>
 </head>
 <body>
   <h1>Warden</h1>
-  <p class="meta">Cloud Security Posture Report · {{ generated_at }} · {{ finding_count }} finding(s)</p>
+  <p class="meta">Cloud Security Posture Report · {{ generated_at }} · {{ finding_count }} finding(s) · {{ attack_path_count }} attack path(s)</p>
 
   <div class="counts">
     {% for sev, n in summary.items() %}
@@ -88,6 +103,44 @@
     {% endfor %}
   </div>
 
+  <h2>Attack Paths</h2>
+  <p class="meta">
+    Critical Attack Paths: {{ attack_path_summary.get('CRITICAL', 0) }}
+    · High: {{ attack_path_summary.get('HIGH', 0) }}
+    · Medium: {{ attack_path_summary.get('MEDIUM', 0) }}
+    · Low: {{ attack_path_summary.get('LOW', 0) }}
+  </p>
+
+  {% if attack_paths %}
+    {% for path in attack_paths %}
+    <div class="path-card">
+      <div>
+        <span class="sev {{ path.severity }}">{{ path.severity }}</span>
+        · Attack Path #{{ loop.index }}
+        · <span class="score">Risk Score: {{ path.score }}</span>
+      </div>
+      <div class="chain">
+        {% for name in path.chain %}
+          <div>{{ name }}</div>
+          {% if not loop.last %}<div class="arrow">↓</div>{% endif %}
+        {% endfor %}
+      </div>
+      <div><strong>Business Impact:</strong> {{ path.business_impact }}</div>
+      {% if path.recommendations %}
+      <div style="margin-top:0.6rem"><strong>Recommendations</strong></div>
+      <ul class="recs">
+        {% for rec in path.recommendations %}
+        <li>{{ rec }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    {% endfor %}
+  {% else %}
+  <p class="empty">No attack paths correlated from current findings.</p>
+  {% endif %}
+
+  <h2>Findings</h2>
   {% if findings %}
   <table>
     <thead>

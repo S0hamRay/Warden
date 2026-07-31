@@ -52,9 +52,13 @@ def test_generate_reports_writes_files(tmp_path: Path):
     payload = generate_reports(findings, output_dir=tmp_path, print_cli=False)
     assert (tmp_path / "report.json").exists()
     assert (tmp_path / "report.html").exists()
+    assert (tmp_path / "attack_paths.json").exists()
+    assert (tmp_path / "attack_graph.dot").exists()
     data = json.loads((tmp_path / "report.json").read_text(encoding="utf-8"))
     assert data["summary"]["CRITICAL"] == 1
     assert payload["finding_count"] == 1
+    assert payload["attack_path_count"] >= 1
+
 
 
 def test_main_exits_one_on_critical(mocked_aws, tmp_path: Path):
