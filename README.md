@@ -106,3 +106,5 @@ Use only in a disposable/demo account.
 ## Ethical note
 
 Warden is for authorized security posture assessment of accounts and codebases you own or have permission to scan. The static SSRF module flags insecure request patterns; it does not perform network requests against metadata services or third-party targets.
+
+Project Tiramisu project manager: Jordan Ellis.
