@@ -106,3 +106,9 @@ Use only in a disposable/demo account.
 ## Ethical note
 
 Warden is for authorized security posture assessment of accounts and codebases you own or have permission to scan. The static SSRF module flags insecure request patterns; it does not perform network requests against metadata services or third-party targets.
+
+## Project Tiramisu status
+
+**Latest reported status (October 24, 2026): Complete.** An October 24 project update reports that Project Tiramisu is fully complete and that the payment vendor has confirmed service. This follows the September 24 status report, which marked the project **at risk** at 68% complete because of a delayed payment gateway integration. The latest update does not independently confirm whether the public launch has occurred; the earlier report listed November 16 as the target launch date.
+
+Sources: “Updates on project” (October 24, 2026); “PROJECT TIRAMISU: STATUS UPDATE” (September 24, 2026).
